@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+  html, body{
+  }
+  #pp{
+    width: 100%;
+    height: 100%;
+  }
+  svg {
+  }
+  </style>
+  <script>
+  </script>
+</head>
+<body>
+  <div id="pp">
+      <svg id="svgDrag" style="background-color: #efefef;" viewBox="0 0 500 500"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <rect width="500" height="500" fill="none" stroke-width="500" stroke="#dedede" stroke-dasharray="2 48" stroke-dashoffset="1" />
+        <path id="line1" stroke-width="2" stroke="indigo" />
+        <path id="line2" stroke-width="2" stroke="#b5b500" />
+        <path id="line3" stroke-width="2" stroke="green" />
+        <path id="line4" stroke-width="2" stroke="black" stroke-dasharray="3 2" />
+        <path id="cubicPath" stroke="rgb(0, 71, 74)" fill="none" stroke-width="6" stroke-linecap="round" />
+        <circle class="point" id="point1" r="8" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <circle class="point" id="point2" r="8" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <circle class="point" id="point3" r="15" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <circle class="point" id="point4" r="15" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <circle class="point" id="point5" r="15" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <circle class="point" id="point6" r="8" stroke="chocolate" fill="transparent" cursor="pointer" />
+        <script>
+          // <![CDATA[
+          ;(function(){
+            let qua = document.querySelectorAll.bind(document);
+            let point1 = {x:100,y:100};
+            let point2 = {x:400,y:150};
+            let point3 = {x:100,y:400};
+            let point4 = {x:400,y:300};
+            let point5 = {x:300,y:450};
+            let point6 = {x:400,y:450};
+            let points = {
+              point1: point1,
+              point2: point2,
+              point3: point3,
+              point4: point4,
+              point5: point5,
+              point6: point6,
+            };
+            drawLine();
+            drawCubicPath();
+            initPoint();
+            qua('.point').forEach( point=>{
+              let dragging = false,
+                  startXPnt = startYPnt = 0,
+                  startXCsr = startYCsr = 0,
+                  deltaX = deltaY = 0,
+                  svgScale = 1,
+                  resultX = resultY = 0;
+              point.addEventListener('mouseenter', ()=>point.setAttribute('fill', 'chocolate'));
+              point.addEventListener('mouseleave', ()=>{!dragging && point.setAttribute('fill', 'transparent')});
+              point.addEventListener('mousedown', (e)=>{
+                e.preventDefault();
+
+                let tmp = qua('#svgDrag')[0].getBoundingClientRect();
+                svgScale = Math.min( tmp.height, tmp.width) / 500;
+
+                dragging=true;
+                startXCsr = e.screenX;
+                startYCsr = e.screenY;
+                startXPnt = +point.getAttribute('cx');
+                startYPnt = +point.getAttribute('cy');
+              });
+              document.addEventListener('mousemove', (e)=>{
+                if(!dragging){
+                  return;
+                }
+                e.preventDefault();
+                deltaX = (+e.screenX) - (+startXCsr);
+                deltaY = (+e.screenY) - (+startYCsr);
+                resultX = startXPnt+deltaX/svgScale;
+                resultY = startYPnt+deltaY/svgScale;
+                if(resultX > 0 && resultX < 500){
+                  points[point.id].x = resultX;
+                  point.setAttribute('cx', resultX)
+                }
+                if(resultY > 0 && resultY < 500){
+                  points[point.id].y = resultY;
+                  point.setAttribute('cy', resultY)
+                }
+                drawLine();
+                drawCubicPath();
+              });
+              document.addEventListener('mouseup', (e)=>{
+                e.preventDefault();
+                dragging=false;
+                point.setAttribute('fill', 'transparent');
+              });
+            });
+            function drawLine(){
+              let line1 = qua('#line1')[0];
+              let line2 = qua('#line2')[0];
+              let line3 = qua('#line3')[0];
+              let line4 = qua('#line4')[0];
+              line1.setAttribute('d', `M${point3.x},${point3.y} L${point1.x},${point1.y}`);
+              line2.setAttribute('d', `M${point4.x},${point4.y} L${point2.x},${point2.y}`);
+              line3.setAttribute('d', `M${point5.x},${point5.y} L${point6.x},${point6.y}`);
+              line4.setAttribute('d', `M${point4.x},${point4.y} L${point4.x*2-point2.x},${point4.y*2-point2.y}`);
+            }
+            function drawCubicPath(){
+              let cubicPath = qua('#cubicPath')[0];
+              cubicPath.setAttribute('d', `M${point3.x},${point3.y} C${point1.x},${point1.y} ${point2.x},${point2.y} ${point4.x},${point4.y} S${point6.x},${point6.y} ${point5.x},${point5.y}`);
+            }
+            function initPoint(){
+              let circle1 = qua('#point1')[0];
+              let circle2 = qua('#point2')[0];
+              let circle3 = qua('#point3')[0];
+              let circle4 = qua('#point4')[0];
+              let circle5 = qua('#point5')[0];
+              let circle6 = qua('#point6')[0];
+              circle1.setAttribute('cx', `${point1.x}`);
+              circle1.setAttribute('cy', `${point1.y}`);
+              circle2.setAttribute('cx', `${point2.x}`);
+              circle2.setAttribute('cy', `${point2.y}`);
+              circle3.setAttribute('cx', `${point3.x}`);
+              circle3.setAttribute('cy', `${point3.y}`);
+              circle4.setAttribute('cx', `${point4.x}`);
+              circle4.setAttribute('cy', `${point4.y}`);
+              circle5.setAttribute('cx', `${point5.x}`);
+              circle5.setAttribute('cy', `${point5.y}`);
+              circle6.setAttribute('cx', `${point6.x}`);
+              circle6.setAttribute('cy', `${point6.y}`);
+            }
+          }());
+          // ]]>
+        </script>
+      </svg>
+    </div>
+  <script>
+  </script>
+</body>
+</html>
